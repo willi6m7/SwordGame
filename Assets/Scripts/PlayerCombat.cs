@@ -75,13 +75,22 @@ public class PlayerCombat : NetworkBehaviour
 
             //cycle through player hits
             Collider[] meleeHitPlayers = Physics.OverlapSphere(meleeAttackArea.position, attackRange, playerLayers);
+            List<Collider> alreadyMeleedPlayers = new List<Collider>();
             foreach (Collider player in meleeHitPlayers)
             {
+                Debug.Log("1");
                 if (IsOwner)
                 {
-                    Debug.Log(player.name);
-                    player.GetComponent<PlayerStats>().PlayerTakeDamageServerRpc(attackDamage);
-                    Debug.Log(GetComponent<PlayerStats>().health.Value);
+                    Debug.Log("2");
+                    if (!alreadyMeleedPlayers.Contains(player))
+                    {
+                        Debug.Log(player.name);
+                        Debug.Log(GetComponent<PlayerStats>().health.Value);
+                        player.GetComponent<PlayerStats>().PlayerTakeDamageServerRpc(attackDamage);
+                        alreadyMeleedPlayers.Add(player);
+                        
+                    }
+                    else Debug.Log("Already hit!");
                 }
                 
             }

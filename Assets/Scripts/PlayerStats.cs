@@ -8,8 +8,8 @@ using UnityEngine;
 
 public class PlayerStats : NetworkBehaviour
 {
-    public NetworkVariableFloat health = new NetworkVariableFloat(100f);
-    private float maxHp = 100f;
+    public NetworkVariableFloat health = new NetworkVariableFloat(200f);
+    private float maxHp = 200f;
     //public bool playerIsBlocking = false;
 
     // Update is called once per frame
