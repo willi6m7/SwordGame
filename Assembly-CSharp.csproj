@@ -55,6 +55,10 @@
   <ItemGroup>
     <Compile Include="Assets\ParrelSync\Examples\CustomArgumentExample.cs" />
     <Compile Include="Assets\Scripts\BasicMovements.cs" />
+    <Compile Include="Assets\Scripts\PlayerCombat.cs" />
+    <Compile Include="Assets\Scripts\EnemyStats.cs" />
+    <Compile Include="Assets\Scripts\CameraScript.cs" />
+    <Compile Include="Assets\Scripts\PlayerStats.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\ParrelSync\VERSION.txt" />
