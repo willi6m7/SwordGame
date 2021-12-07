@@ -191,8 +191,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   attackSpeed: 2
-  nextAttack: 0
-  playerIsBlocking: 0
+  nextAttack: 1
+  blockTimer: 10
+  playerIsBlocking:
+    m_InternalValue: 0
   mpCharController: {fileID: 2712378164448518357}
 --- !u!54 &2712378164448518360
 Rigidbody:

@@ -10,7 +10,8 @@ public class PlayerStats : NetworkBehaviour
 {
     public NetworkVariableFloat health = new NetworkVariableFloat(200f);
     private float maxHp = 200f;
-    //public bool playerIsBlocking = false;
+    public NetworkVariableBool playerBlocking = new NetworkVariableBool(false);
+    public float blockTimer = 10f;
 
     // Update is called once per frame
     //If the player "dies" they respawn at one of the spawn points via the RespawnPlayerServerRpc() and the ResetPlayerClientRpc() methods.
@@ -20,25 +21,29 @@ public class PlayerStats : NetworkBehaviour
         {
             RespawnPlayerServerRpc();
             ResetPlayerClientRpc();
-            if (IsOwner)
-            {
-                Debug.Log("Dead!");
-            }
-
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void PlayerBlockServerRpc()
+    {
+        
+        StartCoroutine(WaiterBlocking());
+        
     }
 
     [ServerRpc(RequireOwnership = false)]
     public void PlayerTakeDamageServerRpc(float damage)
     {
-            health.Value -= damage;
-
-        //else Debug.Log("Blocking not working properly!");
-
-        if (health.Value <= 0)
+        if (playerBlocking.Value == false)
         {
-            Death();
+            health.Value -= damage;
+            if (health.Value <= 0)
+            {
+                Death();
+            }
         }
+        
     }
 
     private void Death()
@@ -64,5 +69,14 @@ public class PlayerStats : NetworkBehaviour
     private void RespawnPlayerServerRpc()
     {
         health.Value = maxHp;
+    }
+
+    IEnumerator WaiterBlocking()
+    {
+        playerBlocking.Value = true;
+        Debug.Log("Blocking!");
+        yield return new WaitForSeconds(blockTimer);
+        playerBlocking.Value = false;
+        Debug.Log("Player is not blocking!");
     }
 }

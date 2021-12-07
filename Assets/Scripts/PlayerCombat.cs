@@ -9,18 +9,18 @@ using UnityEngine;
 public class PlayerCombat : NetworkBehaviour
 {
     public Transform meleeAttackArea;
-    public float attackRange = 0.4f;
-    public int attackDamage = 50;
+    public float attackRange;
+    public int attackDamage;
     public LayerMask enemyLayers;
     public LayerMask playerLayers;
-    public float attackSpeed = 2f;
-    public float nextAttack = 0f;
+    public float attackSpeed;
+    public float nextAttack;
+    public float blockTimer;
+    public bool kick;
 
-    //public ulong attackerId;
-
-    //private NetworkVariableFloat health = new NetworkVariableFloat(100f);
-    //private float maxHp = 100f;
-    public bool playerIsBlocking = false;
+    //This variable is called by the PlayerStats class to resolve damage values.
+    //Is there a better way to do this? Doing this prevents the client from blocking properly.
+    //public NetworkVariableBool playerIsBlocking = new NetworkVariableBool(false);
 
     public CharacterController mpCharController;
 
@@ -36,37 +36,56 @@ public class PlayerCombat : NetworkBehaviour
                 {
                     MeleeAttack();
                     nextAttack = Time.time + 1f / attackSpeed;
+                    
                 }
             }
 
             //Blocking if/else statement
             if (Input.GetMouseButtonDown(1))
             {
-                playerIsBlocking = true;
-                Debug.Log("Player is blocking!");
+                GetComponent<PlayerStats>().PlayerBlockServerRpc();
             }
-            else if (Input.GetMouseButtonUp(1))
+
+            if (Input.GetKeyDown(KeyCode.F))
             {
-                playerIsBlocking = false;
-                Debug.Log("Player is NOT blocking!");
+                Debug.Log("Kick!");
+                Kick();
             }
         }
+    }
+
+
+    void Kick()
+    {
+        kick = true;
+        Collider[] kickHitPlayers = Physics.OverlapSphere(meleeAttackArea.position, attackRange, playerLayers);
+        foreach (Collider player in kickHitPlayers)
+        {
+            if (IsOwner)
+            {
+                //Checks if the player is currently blocking.
+                //if (player.GetComponent<PlayerCombat>().playerIsBlocking.Value && kick)
+                //{
+                //    player.GetComponent<PlayerCombat>().playerIsBlocking.Value = false;
+                //}
+            }
+
+        }
+        kick = false;
     }
 
     //Script for attacking
     //Detects all "enemy"-tagged members and adds them to an array, and loops a foreach through it to deal damage via the TakeDamage method.
     //Additionally calls the Waiter coroutine that stops the player from moving while attacking.
-    //Change the attack damage with the attackDamage variable
-    
-    private void MeleeAttack()
+    //Change the attack damage with the attackDamage variable.
+    public void MeleeAttack()
     {
         if (IsOwner)
         {
-            //attackerId = serverRpcParams.Receive.SenderClientId;
             Debug.Log("Clicked Attack!");
             Collider[] meleeHitEnemies = Physics.OverlapSphere(meleeAttackArea.position, attackRange, enemyLayers);
 
-            //cycle through enemy hits
+            //cycle through enemy NPC hits
             foreach (Collider enemy in meleeHitEnemies)
             {
                 enemy.GetComponent<EnemyStats>().TakeDamageServerRpc(attackDamage);
@@ -74,55 +93,19 @@ public class PlayerCombat : NetworkBehaviour
             }
 
             //cycle through player hits
+            //Uses a Collider[] array to find all the hit targets and then uses a foreach loop to deal out damage.
             Collider[] meleeHitPlayers = Physics.OverlapSphere(meleeAttackArea.position, attackRange, playerLayers);
-            List<Collider> alreadyMeleedPlayers = new List<Collider>();
             foreach (Collider player in meleeHitPlayers)
             {
-                Debug.Log("1");
                 if (IsOwner)
                 {
-                    Debug.Log("2");
-                    if (!alreadyMeleedPlayers.Contains(player))
-                    {
-                        Debug.Log(player.name);
-                        Debug.Log(GetComponent<PlayerStats>().health.Value);
-                        player.GetComponent<PlayerStats>().PlayerTakeDamageServerRpc(attackDamage);
-                        alreadyMeleedPlayers.Add(player);
-                        
-                    }
-                    else Debug.Log("Already hit!");
+                    player.GetComponent<PlayerStats>().PlayerTakeDamageServerRpc(attackDamage);
                 }
                 
             }
-            //StartCoroutine(Waiter());
         }
 
     }
-    /*
-    //Method handling player damage
-    [ServerRpc]
-    void PlayerTakeDamageServerRpc(int dmg)
-    {
-        if (!playerIsBlocking)
-        {
-            health.Value -= dmg;
-            Debug.Log("Struck!");
-        }
-        else if (playerIsBlocking)
-        {
-            health.Value -= 0f;
-            playerIsBlocking = false;
-            Debug.Log("Player Not blocking!");
-        }
-        if (health.Value <= 0f)
-        {
-            Death();
-        }
-    }
-    */
-
-
-
 
     //Debugging tool for seeing the size and location of the attack
     private void OnDrawGizmosSelected()
@@ -133,13 +116,4 @@ public class PlayerCombat : NetworkBehaviour
         }
         Gizmos.DrawWireSphere(meleeAttackArea.position, attackRange);
     }
-
-    //Waiter coroutine
-    /*
-    IEnumerator Waiter()
-    {
-        mpCharController.enabled = false;
-        yield return new WaitForSeconds(1.5f);
-        mpCharController.enabled = true;
-    }*/
 }
