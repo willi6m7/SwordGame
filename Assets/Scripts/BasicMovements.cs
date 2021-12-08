@@ -13,6 +13,8 @@ public class BasicMovements : NetworkBehaviour
     CharacterController mpCharController;
     private SpriteRenderer renderer;
 
+    public Animator animator;
+
 
     void Start()
     {
@@ -36,6 +38,7 @@ public class BasicMovements : NetworkBehaviour
         Vector3 moveVect = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         Vector3 characterScale = transform.localScale;
         mpCharController.SimpleMove(moveVect * movementSpeed);
+        animator.SetFloat("speed", Mathf.Abs(movementSpeed));
 
         //while the Flip function flips the sprite properly, it does not flip the attack point.
         //flips the entire model as it is technically 3d, not 2d.

@@ -15,12 +15,17 @@ public class PlayerCombat : NetworkBehaviour
     public LayerMask playerLayers;
     public float attackSpeed;
     public float nextAttack;
+    public float nextKick;
     public float blockTimer;
-    public bool kick;
+    public bool isBlockingCombat;
+
+    public Animator animator;
+
+    public AudioSource meleeHit;
+    public AudioSource meleeHitSoft;
+    public AudioSource meleeKick;
 
     //This variable is called by the PlayerStats class to resolve damage values.
-    //Is there a better way to do this? Doing this prevents the client from blocking properly.
-    //public NetworkVariableBool playerIsBlocking = new NetworkVariableBool(false);
 
     public CharacterController mpCharController;
 
@@ -32,46 +37,47 @@ public class PlayerCombat : NetworkBehaviour
             //Sets the cooldown of each attack
             if (Time.time >= nextAttack)
             {
-                if (Input.GetMouseButtonDown(0))
+                if (Input.GetMouseButtonDown(0) && !isBlockingCombat)
                 {
+                    //animator.SetBool("isAttackingAnim", false);
                     MeleeAttack();
                     nextAttack = Time.time + 1f / attackSpeed;
-                    
                 }
             }
 
-            //Blocking if/else statement
+            //Blocking if-statement. Dictates cooldown timer as well as what key to press. Calls up to PlayerStats to handle network interactions.
             if (Input.GetMouseButtonDown(1))
             {
+                StartCoroutine(WaiterBlockAnim());
                 GetComponent<PlayerStats>().PlayerBlockServerRpc();
+                
             }
 
+            //Kicking if-statement. Dictates cooldown timer as well as what key to press.
             if (Input.GetKeyDown(KeyCode.F))
             {
                 Debug.Log("Kick!");
                 Kick();
+                nextKick = Time.time + 1f / attackSpeed;
             }
         }
     }
 
-
+    //Kick method. Used to break blocks.
+    //Calls the PlayerKickServerRpc method in PlayerStats. Called by the Kicking if-statement in Update.
     void Kick()
     {
-        kick = true;
+        meleeKick.Play();
+        StartCoroutine(WaiterKickAnim());
         Collider[] kickHitPlayers = Physics.OverlapSphere(meleeAttackArea.position, attackRange, playerLayers);
         foreach (Collider player in kickHitPlayers)
         {
             if (IsOwner)
             {
-                //Checks if the player is currently blocking.
-                //if (player.GetComponent<PlayerCombat>().playerIsBlocking.Value && kick)
-                //{
-                //    player.GetComponent<PlayerCombat>().playerIsBlocking.Value = false;
-                //}
+                
+                player.GetComponent<PlayerStats>().PlayerKickServerRpc();
             }
-
         }
-        kick = false;
     }
 
     //Script for attacking
@@ -82,6 +88,9 @@ public class PlayerCombat : NetworkBehaviour
     {
         if (IsOwner)
         {
+            meleeHitSoft.volume = 0.5f;
+            meleeHitSoft.Play();
+            StartCoroutine(WaiterAttackAnim());
             Debug.Log("Clicked Attack!");
             Collider[] meleeHitEnemies = Physics.OverlapSphere(meleeAttackArea.position, attackRange, enemyLayers);
 
@@ -101,10 +110,10 @@ public class PlayerCombat : NetworkBehaviour
                 {
                     player.GetComponent<PlayerStats>().PlayerTakeDamageServerRpc(attackDamage);
                 }
-                
             }
-        }
 
+        }
+        
     }
 
     //Debugging tool for seeing the size and location of the attack
@@ -115,5 +124,30 @@ public class PlayerCombat : NetworkBehaviour
             return;
         }
         Gizmos.DrawWireSphere(meleeAttackArea.position, attackRange);
+    }
+
+    //Handles the attack animation.
+    IEnumerator WaiterAttackAnim()
+    {
+        animator.SetBool("isAttackingAnim", true);
+        yield return new WaitForSeconds(1);
+        animator.SetBool("isAttackingAnim", false);
+    }
+
+    //Handles the kick animation.
+    IEnumerator WaiterKickAnim()
+    {
+        animator.SetBool("isKickingAnim", true);
+        yield return new WaitForSeconds(1);
+        animator.SetBool("isKickingAnim", false);
+    }
+
+    IEnumerator WaiterBlockAnim()
+    {
+        isBlockingCombat = true;
+        animator.SetBool("isBlockingAnim", true);
+        yield return new WaitForSeconds(3);
+        animator.SetBool("isBlockingAnim", false);
+        isBlockingCombat = false;
     }
 }
