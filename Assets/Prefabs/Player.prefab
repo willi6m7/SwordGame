@@ -174,9 +174,9 @@ GameObject:
   - component: {fileID: 2712378164448518360}
   - component: {fileID: 3364320065632156741}
   - component: {fileID: 3021477341531414527}
-  - component: {fileID: 8743620850897163439}
   - component: {fileID: 9193313539685747152}
   - component: {fileID: -7660288832437710320}
+  - component: {fileID: 5794744709575939858}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -414,25 +414,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &8743620850897163439
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2712378164448518353}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 57a2f5250ea9d264e81cd8c2c9268906, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health:
-    m_InternalValue: 200
-  playerBlocking:
-    m_InternalValue: 0
-  blockTimer: 10
-  deathThwack: {fileID: 3635212302669567518}
-  animator: {fileID: -7660288832437710320}
 --- !u!114 &9193313539685747152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -467,6 +448,28 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &5794744709575939858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2712378164448518353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 252ad8c619b2f354ca580701479c3468, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health:
+    m_InternalValue: 200
+  playerBlocking:
+    m_InternalValue: 0
+  blockTimer: 3
+  spawnPlayerId: 0
+  kills:
+    m_InternalValue: 0
+  deathThwack: {fileID: 3635212302669567518}
+  animator: {fileID: -7660288832437710320}
 --- !u!1 &3773971650733030071
 GameObject:
   m_ObjectHideFlags: 0

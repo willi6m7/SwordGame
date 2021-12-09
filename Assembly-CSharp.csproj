@@ -53,12 +53,17 @@
     <UnityVersion>2020.3.16f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\EnemyStats.cs" />
     <Compile Include="Assets\ParrelSync\Examples\CustomArgumentExample.cs" />
     <Compile Include="Assets\Scripts\BasicMovements.cs" />
-    <Compile Include="Assets\Scripts\PlayerCombat.cs" />
-    <Compile Include="Assets\Scripts\EnemyStats.cs" />
     <Compile Include="Assets\Scripts\CameraScript.cs" />
-    <Compile Include="Assets\Scripts\PlayerStats.cs" />
+    <Compile Include="Assets\Scripts\MPLobbyScript.cs" />
+    <Compile Include="Assets\Scripts\MPPlayerMenuScript.cs" />
+    <Compile Include="Assets\Scripts\MPPlayerCombat.cs" />
+    <Compile Include="Assets\Scripts\MPChatUIScript.cs" />
+    <Compile Include="Assets\Scripts\LobbyPlayerScript.cs" />
+    <Compile Include="Assets\Scripts\MPPlayerStats.cs" />
+    <Compile Include="Assets\Scripts\MPPlayerInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\ParrelSync\VERSION.txt" />
